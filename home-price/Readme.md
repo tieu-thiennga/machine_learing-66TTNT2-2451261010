@@ -1,22 +1,176 @@
-# Bài tập 1: Dự báo chỉ số giá nhà (Linear Regression)
+Dự báo giá nhà
 
-Note lại cách làm bài dự báo chỉ số giá nhà `National-US` từ tập dữ liệu Case-Shiller.
+1. Bài toán
 
-### Các bước thực hiện:
-1. **Lấy dữ liệu:** Tải file csv từ Kaggle về và đọc bằng `pandas`.
-2. **Tiền xử lý:**
-   - Chuyển cột `Date` thành năm (`Year`) và tháng (`Month`).
-   - Chọn các thành phố đại diện làm đặc trưng đầu vào: Los Angeles, San Diego, San Francisco, Washington, Miami, Chicago.
-   - Bỏ các dòng bị trống (`dropna()`).
-3. **Chia tập dữ liệu:** 80% train, 20% test (đặt `shuffle=False` để giữ đúng thứ tự thời gian).
-4. **Chạy mô hình:** Dùng `LinearRegression` của `scikit-learn` để huấn luyện và dự đoán.
+Bài này sử dụng phương pháp hồi quy tuyến tính (Linear Regression) để dự báo giá nhà.
 
-### Kết quả chạy được:
-- R2 Score: ~0.3074
-- MAE: ~35.21
-- RMSE: ~39.83
+Dữ liệu gồm các thông tin về nhà như:
 
-### Cách chạy lại code:
-```bash
-pip install pandas numpy scikit-learn
-python home_price.py
+Diện tích
+
+Số tầng
+
+Số phòng ngủ
+
+Giá/m2
+
+Mục tiêu là dựa vào các thông tin của căn nhà để dự đoán Giá/m2.
+
+2. Các biến sử dụng
+
+X (Features)
+
+Các biến đầu vào:
+
+Diện tích
+
+Số tầng
+
+Số phòng ngủ
+
+y (Target)
+
+Biến cần dự đoán:
+
+Giá/m2
+
+Có thể hiểu đơn giản:
+
+X → Mô hình → y
+
+Diện tích + Số tầng + Số phòng ngủ → Linear Regression → Giá/m2
+
+3. Hồi quy tuyến tính
+
+Hồi quy tuyến tính tìm ra một phương trình để dự đoán giá trị.
+
+Dạng tổng quát:
+
+y = b + w1x1 + w2x2 + ... + wn*xn
+
+Trong đó:
+
+y là giá trị cần dự đoán
+
+x là các biến đầu vào
+
+w là hệ số của các biến
+
+b là hệ số chặn
+
+Sau khi học, mô hình sẽ tìm ra các hệ số này.
+
+4. Các bước làm
+
+Bước 1: Đọc dữ liệu
+
+Đọc file csv bằng pandas.
+
+Bước 2: Xử lý dữ liệu
+
+Chuyển các dữ liệu như:
+
+46 m² → 46
+
+5 phòng → 5
+
+86,96 triệu/m² → số
+
+Các ô không có dữ liệu sẽ được xử lý bằng NaN và loại bỏ khi tạo dữ liệu cho mô hình.
+
+Bước 3: Chọn X và y
+
+X = data[["Diện tích", "Số tầng", "Số phòng ngủ"]]
+y = data["Giá/m2"]
+
+Bước 4: Chia dữ liệu
+
+Chia dữ liệu thành:
+
+80% để train
+
+20% để test
+
+Dùng train_test_split().
+
+Bước 5: Tạo mô hình
+
+model = LinearRegression()
+
+Bước 6: Train
+
+model.fit(X_train, y_train)
+
+Đây là bước mô hình học từ dữ liệu và tìm ra các hệ số.
+
+Bước 7: Dự đoán
+
+y_pred = model.predict(X_test)
+
+Mô hình sử dụng những gì đã học để dự đoán giá.
+
+Bước 8: Đánh giá
+
+Sử dụng:
+
+MAE
+
+RMSE
+
+R2
+
+để xem mô hình dự đoán tốt hay không.
+
+5. Kết quả
+
+Mô hình hiện tại sử dụng 3 đặc trưng:
+
+Diện tích
+
+Số tầng
+
+Số phòng ngủ
+
+Sau khi chạy mô hình sẽ thu được:
+
+MAE
+
+RMSE
+
+R2
+
+Các Weight
+
+Intercept
+
+Từ Weight và Intercept có thể viết được phương trình mà mô hình đã học.
+
+6. Kiến thức học được
+
+Qua bài này tìm hiểu được:
+
+Dataset
+
+Feature
+
+Target
+
+X và y
+
+Train/Test
+
+Linear Regression
+
+Weight
+
+Intercept
+
+fit()
+
+predict()
+
+MAE
+
+RMSE
+
+R2
