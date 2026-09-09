@@ -1,55 +1,77 @@
 import pandas as pd
 import numpy as np
+
 from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split 
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-file_name = 'data.csv'
-df = pd.read_csv(file_name)
 
-df["Date"] = pd.to_datetime(df["Date"])
-df["Year"] = df["Date"].dt.year
-df["Month"] = df["Date"].dt.month
+df = pd.read_csv('data.csv')
 
-features = [
-    "Year",
-    "Month",
-    "CA-Los Angeles",
-    "CA-San Diego",
-    "CA-San Francisco",
-    "DC-Washington",
-    "FL-Miami",
-    "IL-Chicago",
+df["Diện tích"] = (
+    df["Diện tích"]
+    .str.replace(" m²", "", regex=False)
+    .str.replace(",", ".", regex=False)
+    .astype(float)
+)
+
+df["Số tầng"] = pd.to_numeric(
+    df["Số tầng"],
+    errors="coerce"
+)
+
+df["Số phòng ngủ"] = (
+    df["Số phòng ngủ"]
+    .str.replace(" phòng", "", regex=False)
+)
+df["Số phòng ngủ"] = pd.to_numeric(
+    df["Số phòng ngủ"],
+    errors="coerce"
+)
+df["Giá/m2"] = (
+    df["Giá/m2"]
+    .str.replace(" triệu/m²", "", regex=False)
+    .str.replace(" đ/m²", "", regex=False)
+    .str.replace(",", ".", regex=False)
+)
+
+df["Giá/m2"] = pd.to_numeric(
+    df["Giá/m2"],
+    errors="coerce"
+)
+data = df[
+    ["Diện tích", "Số tầng", "Số phòng ngủ", "Giá/m2"]
+].dropna()
+
+# xử lý dữ liệu đặt biến tìm hàm 
+X = data[
+    ["Diện tích", "Số tầng", "Số phòng ngủ"]
 ]
 
-target = "National-US"
+y = data["Giá/m2"]
 
-data = df[features + [target]].copy()
-data = data.dropna()
-
-x = data[features]
-y = data[target]
-
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, shuffle=False)
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.2,
+    random_state=42
+)
 
 model = LinearRegression()
 model.fit(X_train, y_train)
-
 y_pred = model.predict(X_test)
 
-r2 = r2_score(y_test, y_pred)
 mae = mean_absolute_error(y_test, y_pred)
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+r2 = r2_score(y_test, y_pred)
 
-print("=== KẾT QUẢ ĐÁNH GIÁ MÔ HÌNH ===")
-print(f"Hệ số xác định R2 Score: {r2:.4f}")
-print(f"MAE (Sai số tuyệt đối trung bình): {mae:.4f}")
-print(f"RMSE: {rmse:.4f}")
 
-weights = pd.DataFrame({"Đặc trưng": features, "Hệ số (Weight)": model.coef_})
-print("\n=== MỨC ĐỘ ẢNH HƯỞNG CỦA CÁC ĐẶC TRƯNG ===")
-print(weights)
-comparison = pd.DataFrame(
-    {"Thực tế": y_test.tail(5).values, "Mô hình dự báo": y_pred[-5:]}
-)
-print("\n=== SO SÁNH 5 KẾT QUẢ CUỐI CÙNG ===")
-print(comparison)
+print("Sai số tuyệt đối trung bình (MAE):", mae)
+print("RMSE:", rmse)
+print("R2:", r2)
+
+
+print("b = ", model.intercept_)
+
+print("hệ số :")
+for feature, weight in zip(X.columns, model.coef_):
+    print(feature, "=", weight)
